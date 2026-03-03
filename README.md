@@ -1,57 +1,52 @@
-# CNPJ Data Pipeline (v2)
+# CNPJ Extractor Pipeline
 
-[![Release](https://img.shields.io/github/v/release/caiopizzol/cnpj-data-pipeline)](https://github.com/caiopizzol/cnpj-data-pipeline/releases)
 [![Python](https://img.shields.io/badge/python-3.11+-blue)](https://www.python.org)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![codecov](https://codecov.io/gh/caiopizzol/cnpj-data-pipeline/graph/badge.svg)](https://codecov.io/gh/caiopizzol/cnpj-data-pipeline)
 
-Baixa e processa dados de empresas brasileiras da Receita Federal para PostgreSQL.
+Downloads and processes Brazilian company data from Receita Federal into PostgreSQL.
 
-> [!IMPORTANT]
-> **Novo em v1.3.2** — _A Receita Federal migrou os arquivos CNPJ para um novo repositório Nextcloud. Esta versão já suporta a nova URL e realiza downloads via WebDAV automaticamente. Nenhuma configuração adicional necessária._
-
-## Requisitos
+## Requirements
 
 - [uv](https://docs.astral.sh/uv/) - `brew install uv`
 - [just](https://github.com/casey/just) - `brew install just`
 - Docker
 
-## Início Rápido
+## Quick Start
 
 ```bash
 cp .env.example .env
-just up      # Iniciar PostgreSQL
-just run     # Executar pipeline
+just up      # Start PostgreSQL
+just run     # Run pipeline
 ```
 
-## Comandos
+## Commands
 
 ```bash
-just install # Instalar dependências
-just up      # Iniciar PostgreSQL
-just down    # Parar PostgreSQL
-just db      # Entrar no banco (psql)
-just run     # Executar pipeline
-just reset   # Limpar e reiniciar banco
-just lint    # Verificar código
-just format  # Formatar código
-just test    # Rodar testes
-just check   # Rodar todos (lint, format, test)
+just install # Install dependencies
+just up      # Start PostgreSQL
+just down    # Stop PostgreSQL
+just db      # Open psql shell
+just run     # Run pipeline
+just reset   # Clear and reset database
+just lint    # Check code
+just format  # Format code
+just test    # Run tests
+just check   # Run all (lint, format, test)
 ```
 
-## Uso
+## Usage
 
 ```bash
-just run                          # Processar mês mais recente
-just run --list                   # Listar meses disponíveis
-just run --month 2024-11          # Processar mês específico
-just run --month 2024-11 --force  # Forçar reprocessamento
+just run                          # Process most recent month
+just run --list                   # List available months
+just run --month 2024-11          # Process specific month
+just run --month 2024-11 --force  # Force reprocessing
 ```
 
-## Configuração
+## Configuration
 
 ```bash
-DATABASE_URL=postgres://postgres:postgres@localhost:5435/cnpj
+DATABASE_URL=postgres://hunt:hunt@localhost:5432/hunt
 BATCH_SIZE=500000
 TEMP_DIR=./temp
 DOWNLOAD_WORKERS=4
@@ -64,15 +59,17 @@ KEEP_DOWNLOADED_FILES=false
 
 ## Schema
 
-> Documentação completa: [docs/data-schema.md](docs/data-schema.md)
+> Full documentation: [readme.data.md](readme.data.md)
+
+All tables use the `pj_` prefix to distinguish them within the shared `hunt` database.
 
 ```
-EMPRESAS (1) ─── (N) ESTABELECIMENTOS
-         ├─── (N) SOCIOS
-         └─── (1) DADOS_SIMPLES
+pj_companies (1) --- (N) pj_establishments
+             |--- (N) pj_partners
+             '--- (1) pj_simples_nacional
 ```
 
-## Fonte de Dados
+## Data Source
 
 - **URL**: https://arquivos.receitafederal.gov.br/index.php/s/YggdBLfdninEJX9
-- **Atualização**: Mensal
+- **Update frequency**: Monthly

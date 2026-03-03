@@ -12,7 +12,7 @@ from xml.etree import ElementTree
 import requests
 from tqdm import tqdm
 
-from config import Config
+from scripts.config import Config
 
 logger = logging.getLogger(__name__)
 

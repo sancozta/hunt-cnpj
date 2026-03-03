@@ -14,7 +14,7 @@ dependencies = [
 cnpj-pipeline = "main:main"
 
 [tool.setuptools]
-py-modules = ["config", "database", "downloader", "processor", "main"]
+py-modules = ["scripts.config", "scripts.database", "scripts.downloader", "scripts.processor", "main"]
 
 [tool.semantic_release]
 version_toml = ["pyproject.toml:project.version"]

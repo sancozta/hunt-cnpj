@@ -11,88 +11,88 @@ logger = logging.getLogger(__name__)
 
 # File pattern → table name mapping
 FILE_MAPPINGS = {
-    "CNAECSV": "cnaes",
-    "MOTICSV": "motivos",
-    "MUNICCSV": "municipios",
-    "NATJUCSV": "naturezas_juridicas",
-    "PAISCSV": "paises",
-    "QUALSCSV": "qualificacoes_socios",
-    "EMPRECSV": "empresas",
-    "ESTABELE": "estabelecimentos",
-    "SOCIOCSV": "socios",
-    "SIMPLESCSV": "dados_simples",
+    "CNAECSV": "pj_activity_codes",
+    "MOTICSV": "pj_status_reasons",
+    "MUNICCSV": "pj_cities",
+    "NATJUCSV": "pj_legal_natures",
+    "PAISCSV": "pj_countries",
+    "QUALSCSV": "pj_partner_qualifications",
+    "EMPRECSV": "pj_companies",
+    "ESTABELE": "pj_establishments",
+    "SOCIOCSV": "pj_partners",
+    "SIMPLESCSV": "pj_simples_nacional",
 }
 
 # Column names by file type
 COLUMNS = {
-    "CNAECSV": ["codigo", "descricao"],
-    "MOTICSV": ["codigo", "descricao"],
-    "MUNICCSV": ["codigo", "descricao"],
-    "NATJUCSV": ["codigo", "descricao"],
-    "PAISCSV": ["codigo", "descricao"],
-    "QUALSCSV": ["codigo", "descricao"],
+    "CNAECSV": ["code", "description"],
+    "MOTICSV": ["code", "description"],
+    "MUNICCSV": ["code", "description"],
+    "NATJUCSV": ["code", "description"],
+    "PAISCSV": ["code", "description"],
+    "QUALSCSV": ["code", "description"],
     "EMPRECSV": [
-        "cnpj_basico",
-        "razao_social",
-        "natureza_juridica",
-        "qualificacao_responsavel",
-        "capital_social",
-        "porte",
-        "ente_federativo_responsavel",
+        "cnpj",
+        "social_reason_name",
+        "legal_nature_name",
+        "responsible_qualification",
+        "social_capital",
+        "company_size",
+        "responsible_federative_entity",
     ],
     "ESTABELE": [
-        "cnpj_basico",
-        "cnpj_ordem",
-        "cnpj_dv",
-        "identificador_matriz_filial",
-        "nome_fantasia",
-        "situacao_cadastral",
-        "data_situacao_cadastral",
-        "motivo_situacao_cadastral",
-        "nome_cidade_exterior",
-        "pais",
-        "data_inicio_atividade",
-        "cnae_fiscal_principal",
-        "cnae_fiscal_secundaria",
-        "tipo_logradouro",
-        "logradouro",
-        "numero",
-        "complemento",
-        "bairro",
-        "cep",
-        "uf",
-        "municipio",
-        "ddd_1",
-        "telefone_1",
-        "ddd_2",
-        "telefone_2",
-        "ddd_fax",
+        "cnpj",
+        "cnpj_establishment",
+        "cnpj_check_digit",
+        "filial_identifier",
+        "fantasy_name",
+        "status",
+        "status_date",
+        "status_reason",
+        "exterior_city_name",
+        "country",
+        "activity_start_date",
+        "cnae_primary",
+        "cnae_secondary",
+        "street_type",
+        "street",
+        "number",
+        "complement",
+        "district",
+        "zip_code",
+        "state",
+        "city",
+        "area_code_primary",
+        "phone_primary",
+        "area_code_secondary",
+        "phone_secondary",
+        "fax_area_code",
         "fax",
-        "correio_eletronico",
-        "situacao_especial",
-        "data_situacao_especial",
+        "email",
+        "special_status",
+        "special_status_date",
     ],
     "SOCIOCSV": [
-        "cnpj_basico",
-        "identificador_de_socio",
-        "nome_socio",
-        "cnpj_cpf_do_socio",
-        "qualificacao_do_socio",
-        "data_entrada_sociedade",
-        "pais",
-        "representante_legal",
-        "nome_do_representante",
-        "qualificacao_do_representante_legal",
-        "faixa_etaria",
+        "cnpj",
+        "partner_type",
+        "partner_name",
+        "partner_document",
+        "partner_qualification",
+        "entry_date",
+        "country",
+        "legal_representative",
+        "representative_name",
+        "representative_qualification",
+        "age_range",
     ],
     "SIMPLESCSV": [
-        "cnpj_basico",
-        "opcao_pelo_simples",
-        "data_opcao_pelo_simples",
-        "data_exclusao_do_simples",
-        "opcao_pelo_mei",
-        "data_opcao_pelo_mei",
-        "data_exclusao_do_mei",
+        "cnpj",
+        "simples_option",
+        "simples_option_date",
+        "simples_exclusion_date",
+        "mei_option",
+        "mei_option_date",
+        "mei_exclusion_date",
     ],
 }
 
@@ -173,20 +173,20 @@ def process_file(
 def _transform(df: pl.DataFrame, file_type: str) -> pl.DataFrame:
     """Apply transformations based on file type."""
 
-    # Capital social: "1.234,56" → "1234.56"
-    if file_type == "EMPRECSV" and "capital_social" in df.columns:
-        df = df.with_columns(pl.col("capital_social").str.replace_all(r"\.", "").str.replace(",", "."))
+    # Social capital: "1.234,56" → "1234.56"
+    if file_type == "EMPRECSV" and "social_capital" in df.columns:
+        df = df.with_columns(pl.col("social_capital").str.replace_all(r"\.", "").str.replace(",", "."))
 
     # Date columns: "0" or "00000000" → null
     date_cols = {
-        "ESTABELE": ["data_situacao_cadastral", "data_inicio_atividade", "data_situacao_especial"],
+        "ESTABELE": ["status_date", "activity_start_date", "special_status_date"],
         "SIMPLESCSV": [
-            "data_opcao_pelo_simples",
-            "data_exclusao_do_simples",
-            "data_opcao_pelo_mei",
-            "data_exclusao_do_mei",
+            "simples_option_date",
+            "simples_exclusion_date",
+            "mei_option_date",
+            "mei_exclusion_date",
         ],
-        "SOCIOCSV": ["data_entrada_sociedade"],
+        "SOCIOCSV": ["entry_date"],
     }
     if file_type in date_cols:
         for col in date_cols[file_type]:
@@ -198,12 +198,12 @@ def _transform(df: pl.DataFrame, file_type: str) -> pl.DataFrame:
                     .alias(col)
                 )
 
-    # Estabelecimentos: pad country code
-    if file_type == "ESTABELE" and "pais" in df.columns:
-        df = df.with_columns(pl.col("pais").str.zfill(3))
+    # Establishments: pad country code
+    if file_type == "ESTABELE" and "country" in df.columns:
+        df = df.with_columns(pl.col("country").str.zfill(3))
 
-    # Socios: ensure cnpj_cpf_do_socio is not null (PK)
-    if file_type == "SOCIOCSV" and "cnpj_cpf_do_socio" in df.columns:
-        df = df.with_columns(pl.col("cnpj_cpf_do_socio").fill_null("00000000000000"))
+    # Partners: ensure partner_document is not null (PK)
+    if file_type == "SOCIOCSV" and "partner_document" in df.columns:
+        df = df.with_columns(pl.col("partner_document").fill_null("00000000000000"))
 
     return df

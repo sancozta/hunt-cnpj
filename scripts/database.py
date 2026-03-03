@@ -59,7 +59,7 @@ class Database:
         try:
             with self.conn.cursor() as cur:
                 cur.execute(
-                    "SELECT filename FROM processed_files WHERE directory = %s",
+                    "SELECT filename FROM pj_processed_files WHERE directory = %s",
                     (directory,),
                 )
                 return {row[0] for row in cur.fetchall()}
@@ -71,7 +71,7 @@ class Database:
         self.connect()
         with self.conn.cursor() as cur:
             cur.execute(
-                """INSERT INTO processed_files (directory, filename)
+                """INSERT INTO pj_processed_files (directory, filename)
                    VALUES (%s, %s)
                    ON CONFLICT (directory, filename) DO NOTHING""",
                 (directory, filename),
@@ -83,7 +83,7 @@ class Database:
         self.connect()
         with self.conn.cursor() as cur:
             cur.execute(
-                "DELETE FROM processed_files WHERE directory = %s",
+                "DELETE FROM pj_processed_files WHERE directory = %s",
                 (directory,),
             )
             self.conn.commit()

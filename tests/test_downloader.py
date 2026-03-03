@@ -6,8 +6,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 import requests
 
-from config import Config
-from downloader import CNPJ_FILE_PATTERNS, Downloader
+from scripts.config import Config
+from scripts.downloader import CNPJ_FILE_PATTERNS, Downloader
 
 
 def _webdav_xml(entries: list[str]) -> bytes:

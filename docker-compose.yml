@@ -12,8 +12,9 @@ services:
     container_name: cnpj-pipeline
     env_file: .env
     environment:
-      # Override DATABASE_URL for container networking
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/cnpj
+      # Quando rodando standalone, usa o banco local via porta exposta
+      # Quando rodando via compose da raiz, o override de env aponta para o serviço interno
+      DATABASE_URL: postgres://hunt:hunt@postgres:5432/hunt
     depends_on:
       postgres:
         condition: service_healthy
@@ -25,8 +26,8 @@ services:
     image: postgres:16-alpine
     container_name: cnpj-pipeline-postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: hunt
+      POSTGRES_PASSWORD: hunt
       POSTGRES_DB: cnpj
     ports:
       - "5435:5432"

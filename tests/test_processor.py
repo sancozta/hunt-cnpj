@@ -5,7 +5,7 @@ from pathlib import Path
 
 import polars as pl
 
-from processor import _convert_encoding, _transform, get_file_type, process_file
+from scripts.processor import _convert_encoding, _transform, get_file_type, process_file
 
 
 class TestGetFileType:
@@ -65,68 +65,68 @@ class TestTransform:
         # Create test dataframe with date columns
         df = pl.DataFrame(
             {
-                "cnpj_basico": ["12345678"],
-                "data_situacao_cadastral": ["0"],
-                "data_inicio_atividade": ["00000000"],
-                "data_situacao_especial": ["20230101"],  # Valid date should remain
+                "cnpj": ["12345678"],
+                "status_date": ["0"],
+                "activity_start_date": ["00000000"],
+                "special_status_date": ["20230101"],  # Valid date should remain
             }
         )
 
         result = _transform(df, "ESTABELE")
 
         # Check that '0' became None
-        assert result["data_situacao_cadastral"][0] is None
+        assert result["status_date"][0] is None
 
         # Check that '00000000' became None
-        assert result["data_inicio_atividade"][0] is None
+        assert result["activity_start_date"][0] is None
 
         # Check that valid date remained unchanged
-        assert result["data_situacao_especial"][0] == "20230101"
+        assert result["special_status_date"][0] == "20230101"
 
     def test_transform_zero_dates_to_none_simples(self):
         """Test that '0' and '00000000' dates become None for SIMPLES data."""
         df = pl.DataFrame(
             {
-                "cnpj_basico": ["12345678"],
-                "data_opcao_pelo_simples": ["0"],
-                "data_exclusao_do_simples": ["00000000"],
-                "data_opcao_pelo_mei": ["20230101"],
-                "data_exclusao_do_mei": ["0"],
+                "cnpj": ["12345678"],
+                "simples_option_date": ["0"],
+                "simples_exclusion_date": ["00000000"],
+                "mei_option_date": ["20230101"],
+                "mei_exclusion_date": ["0"],
             }
         )
 
         result = _transform(df, "SIMPLESCSV")
 
         # Check that '0' dates became None
-        assert result["data_opcao_pelo_simples"][0] is None
-        assert result["data_exclusao_do_mei"][0] is None
+        assert result["simples_option_date"][0] is None
+        assert result["mei_exclusion_date"][0] is None
 
         # Check that '00000000' became None
-        assert result["data_exclusao_do_simples"][0] is None
+        assert result["simples_exclusion_date"][0] is None
 
         # Check that valid date remained unchanged
-        assert result["data_opcao_pelo_mei"][0] == "20230101"
+        assert result["mei_option_date"][0] == "20230101"
 
     def test_transform_zero_dates_to_none_socios(self):
         """Test that '0' and '00000000' dates become None for socios data."""
-        df = pl.DataFrame({"cnpj_basico": ["12345678"], "data_entrada_sociedade": ["0"]})
+        df = pl.DataFrame({"cnpj": ["12345678"], "entry_date": ["0"]})
 
         result = _transform(df, "SOCIOCSV")
 
         # Check that '0' became None
-        assert result["data_entrada_sociedade"][0] is None
+        assert result["entry_date"][0] is None
 
     def test_transform_null_dates_remain_none(self):
         """Test that null dates remain None."""
         df = pl.DataFrame(
-            {"cnpj_basico": ["12345678"], "data_situacao_cadastral": [None], "data_inicio_atividade": [None]}
+            {"cnpj": ["12345678"], "status_date": [None], "activity_start_date": [None]}
         )
 
         result = _transform(df, "ESTABELE")
 
         # Check that None values remain None
-        assert result["data_situacao_cadastral"][0] is None
-        assert result["data_inicio_atividade"][0] is None
+        assert result["status_date"][0] is None
+        assert result["activity_start_date"][0] is None
 
     def test_transform_valid_dates_unchanged(self):
         """Test that valid dates are not changed."""
@@ -134,10 +134,10 @@ class TestTransform:
 
         df = pl.DataFrame(
             {
-                "cnpj_basico": ["12345678", "87654321", "11223344"],
-                "data_situacao_cadastral": valid_dates,
-                "data_inicio_atividade": valid_dates,
-                "data_situacao_especial": valid_dates,
+                "cnpj": ["12345678", "87654321", "11223344"],
+                "status_date": valid_dates,
+                "activity_start_date": valid_dates,
+                "special_status_date": valid_dates,
             }
         )
 
@@ -145,13 +145,13 @@ class TestTransform:
 
         # Check that all valid dates remained unchanged
         for i, expected_date in enumerate(valid_dates):
-            assert result["data_situacao_cadastral"][i] == expected_date
-            assert result["data_inicio_atividade"][i] == expected_date
-            assert result["data_situacao_especial"][i] == expected_date
+            assert result["status_date"][i] == expected_date
+            assert result["activity_start_date"][i] == expected_date
+            assert result["special_status_date"][i] == expected_date
 
     def test_transform_no_date_columns_file_type(self):
         """Test _transform with file type that has no date transformations."""
-        df = pl.DataFrame({"codigo": ["123"], "descricao": ["Test"]})
+        df = pl.DataFrame({"code": ["123"], "description": ["Test"]})
 
         result = _transform(df, "CNAECSV")
 
@@ -162,9 +162,9 @@ class TestTransform:
         """Test _transform with mixed valid and invalid date values."""
         df = pl.DataFrame(
             {
-                "cnpj_basico": ["12345678", "87654321", "11223344", "99887766"],
-                "data_opcao_pelo_simples": ["0", "20230101", "00000000", None],
-                "data_exclusao_do_simples": ["20240101", "0", "20230615", "00000000"],
+                "cnpj": ["12345678", "87654321", "11223344", "99887766"],
+                "simples_option_date": ["0", "20230101", "00000000", None],
+                "simples_exclusion_date": ["20240101", "0", "20230615", "00000000"],
             }
         )
 
@@ -175,8 +175,8 @@ class TestTransform:
         expected_exclusao = ["20240101", None, "20230615", None]
 
         for i in range(len(expected_opcao)):
-            assert result["data_opcao_pelo_simples"][i] == expected_opcao[i]
-            assert result["data_exclusao_do_simples"][i] == expected_exclusao[i]
+            assert result["simples_option_date"][i] == expected_opcao[i]
+            assert result["simples_exclusion_date"][i] == expected_exclusao[i]
 
 
 class TestConvertEncoding:
@@ -249,9 +249,9 @@ class TestProcessFile:
 
         assert len(results) == 1
         df, table_name, columns = results[0]
-        assert table_name == "cnaes"
+        assert table_name == "pj_activity_codes"
         assert len(df) == 3
-        assert columns == ["codigo", "descricao"]
+        assert columns == ["code", "description"]
 
     def test_processes_simples_file(self, tmp_path):
         """Test that SIMPLES files are processed correctly."""
@@ -264,9 +264,9 @@ class TestProcessFile:
 
         assert len(results) == 1
         df, table_name, columns = results[0]
-        assert table_name == "dados_simples"
+        assert table_name == "pj_simples_nacional"
         # Verify date transformation (0 → None)
-        assert df["data_exclusao_do_simples"][0] is None
+        assert df["simples_exclusion_date"][0] is None
 
     def test_cleans_up_temp_file(self, tmp_path):
         """Test that temporary UTF-8 file is deleted after processing."""

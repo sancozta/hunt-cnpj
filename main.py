@@ -16,10 +16,10 @@ import sys
 
 from tqdm import tqdm
 
-from config import config
-from database import Database
-from downloader import Downloader
-from processor import get_file_type, process_file
+from scripts.config import config
+from scripts.database import Database
+from scripts.downloader import Downloader
+from scripts.processor import get_file_type, process_file
 
 # Configure logging
 logging.basicConfig(
