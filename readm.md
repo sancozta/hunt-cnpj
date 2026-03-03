@@ -1,17 +1,17 @@
-# CNPJ Extractor Pipeline
+### CNPJ Extractor Pipeline
 
 [![Python](https://img.shields.io/badge/python-3.11+-blue)](https://www.python.org)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 Downloads and processes Brazilian company data from Receita Federal into PostgreSQL.
 
-## Requirements
+#### Requirements
 
 - [uv](https://docs.astral.sh/uv/) - `brew install uv`
 - [just](https://github.com/casey/just) - `brew install just`
 - Docker
 
-## Quick Start
+#### Quick Start
 
 ```bash
 cp .env.example .env
@@ -19,7 +19,7 @@ just up      # Start PostgreSQL
 just run     # Run pipeline
 ```
 
-## Commands
+#### Commands
 
 ```bash
 just install # Install dependencies
@@ -34,7 +34,7 @@ just test    # Run tests
 just check   # Run all (lint, format, test)
 ```
 
-## Usage
+#### Usage
 
 ```bash
 just run                          # Process most recent month
@@ -43,7 +43,7 @@ just run --month 2024-11          # Process specific month
 just run --month 2024-11 --force  # Force reprocessing
 ```
 
-## Configuration
+#### Configuration
 
 ```bash
 DATABASE_URL=postgres://hunt:hunt@localhost:5432/hunt
@@ -57,7 +57,7 @@ READ_TIMEOUT=300
 KEEP_DOWNLOADED_FILES=false
 ```
 
-## Schema
+#### Schema
 
 > Full documentation: [readme.data.md](readme.data.md)
 
@@ -69,7 +69,7 @@ pj_companies (1) --- (N) pj_establishments
              '--- (1) pj_simples_nacional
 ```
 
-## Data Source
+#### Data Source
 
 - **URL**: https://arquivos.receitafederal.gov.br/index.php/s/YggdBLfdninEJX9
 - **Update frequency**: Monthly
