@@ -8,3 +8,4 @@ temp/
 .coverage
 coverage.xml
 **/__init__.py
+.ruff_cache/
