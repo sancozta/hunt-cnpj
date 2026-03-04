@@ -118,9 +118,7 @@ class TestTransform:
 
     def test_transform_null_dates_remain_none(self):
         """Test that null dates remain None."""
-        df = pl.DataFrame(
-            {"cnpj": ["12345678"], "status_date": [None], "activity_start_date": [None]}
-        )
+        df = pl.DataFrame({"cnpj": ["12345678"], "status_date": [None], "activity_start_date": [None]})
 
         result = _transform(df, "ESTABELE")
 

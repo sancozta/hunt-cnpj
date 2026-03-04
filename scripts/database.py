@@ -157,7 +157,7 @@ class Database:
         update_cols = [c for c in columns if c not in primary_keys]
         update_clause = ", ".join([f'"{c}" = EXCLUDED."{c}"' for c in update_cols])
         if update_clause:
-            update_clause += ", data_atualizacao = CURRENT_TIMESTAMP"
+            update_clause += ", updated_at = CURRENT_TIMESTAMP"
 
         sql = f"""
             INSERT INTO {target_table} ({columns_str})

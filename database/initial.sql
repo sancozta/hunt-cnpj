@@ -148,3 +148,5 @@ CREATE INDEX IF NOT EXISTS idx_pj_establishments_city ON pj_establishments(city)
 CREATE INDEX IF NOT EXISTS idx_pj_establishments_status ON pj_establishments(status); -- situacao_cadastral
 CREATE INDEX IF NOT EXISTS idx_pj_establishments_cnae ON pj_establishments(cnae_primary); -- cnae_fiscal_principal
 CREATE INDEX IF NOT EXISTS idx_pj_partners_cnpj ON pj_partners(cnpj); -- cnpj_basico
+CREATE INDEX IF NOT EXISTS idx_pj_establishments_cnpj ON pj_establishments(cnpj); -- cnpj_basico (for fast joins)
+CREATE INDEX IF NOT EXISTS idx_pj_companies_social_reason ON pj_companies(social_reason_name text_pattern_ops); -- razao_social (search)
